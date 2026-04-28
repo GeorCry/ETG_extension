@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM ETG Tools — Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700;900&display=swap');
+  :root {
+    --bg:#0d0f14;--surface:#151820;--border:#1e2330;
+    --accent:#6c5ce7;--accent2:#00b894;--accent3:#0984e3;
+    --warn:#fdcb6e;--text:#e2e8f0;--muted:#64748b;--code-bg:#0a0c10;
+    --red:#d63031;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;line-height:1.7;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(108,92,231,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(108,92,231,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:60px 24px 100px;}
+  header{text-align:center;margin-bottom:64px;}
+  .logo{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 16px;font-size:11px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:28px;}
+  .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);box-shadow:0 0 8px var(--accent2);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+  h1{font-family:'Unbounded',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:900;line-height:1.1;letter-spacing:-0.02em;margin-bottom:16px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);font-size:13px;}
+  .lang-tabs{display:flex;gap:8px;margin-bottom:48px;border-bottom:1px solid var(--border);}
+  .lang-tab{padding:10px 24px;cursor:pointer;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;}
+  .lang-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .lang-content{display:none;}.lang-content.active{display:block;}
+  .section{margin-bottom:44px;}
+  .section-label{font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+  h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);}
+  .steps{display:flex;flex-direction:column;gap:12px;}
+  .step{display:flex;gap:16px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color 0.2s;}
+  .step:hover{border-color:var(--accent);}
+  .step-num{flex-shrink:0;width:28px;height:28px;border-radius:6px;background:var(--accent);color:#fff;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+  .step-text{font-size:13px;padding-top:4px;}
+  code{background:var(--code-bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--warn);}
+  .features-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+  @media(max-width:800px){.features-4{grid-template-columns:1fr 1fr;}}
+  @media(max-width:500px){.features-4{grid-template-columns:1fr;}}
+  .feature-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color 0.2s,transform 0.2s;}
+  .feature-card:hover{transform:translateY(-2px);}
+  .feature-card.purple:hover{border-color:var(--accent);}
+  .feature-card.green:hover{border-color:var(--accent2);}
+  .feature-card.blue:hover{border-color:var(--accent3);}
+  .feature-card.red:hover{border-color:var(--red);}
+  .feature-icon{font-size:26px;margin-bottom:10px;display:block;}
+  .feature-title{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;margin-bottom:8px;}
+  .feature-title.purple{color:var(--accent);}
+  .feature-title.green{color:var(--accent2);}
+  .feature-title.blue{color:var(--accent3);}
+  .feature-title.red{color:var(--red);}
+  .feature-desc{font-size:11px;color:var(--muted);line-height:1.8;}
+  .how-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .how-item:last-child{border-bottom:none;}
+  .how-emoji{flex-shrink:0;font-size:18px;width:28px;text-align:center;}
+  .how-text{color:var(--muted);}
+  .how-text strong{color:var(--text);}
+  .note{border-radius:10px;padding:16px 18px;font-size:12px;margin-top:16px;}
+  .note.warn{background:rgba(253,203,110,0.06);border:1px solid rgba(253,203,110,0.2);color:var(--warn);}
+  .note.info{background:rgba(9,132,227,0.06);border:1px solid rgba(9,132,227,0.25);color:#74b9ff;}
+  .note strong{display:block;margin-bottom:6px;font-family:'Unbounded',sans-serif;font-size:10px;letter-spacing:0.1em;}
+  .divider{height:1px;background:var(--border);margin:28px 0;}
+  .reason-preview{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:200px;margin:12px 0;}
+  .reason-btn{padding:6px 4px;border:none;border-radius:6px;font-size:11px;font-weight:700;color:#fff;cursor:default;text-align:center;}
+  .ideas-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:600px){.ideas-grid{grid-template-columns:1fr;}}
+  .idea-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:12px;color:var(--muted);transition:border-color 0.2s;}
+  .idea-card:hover{border-color:var(--accent);}
+  .idea-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  footer{text-align:center;margin-top:80px;color:var(--muted);font-size:11px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><div class="logo-dot"></div>crm.etg.team</div>
+    <h1>CRM ETG <span>Tools</span></h1>
+    <p class="subtitle">Chrome Extension v2.0 · Handover + Auto Prolongation + Open Tickets + Close Duplicates</p>
+  </header>
+
+  <div class="lang-tabs">
+    <button class="lang-tab active" onclick="setLang('ru',event)">🇷🇺 Русский</button>
+    <button class="lang-tab" onclick="setLang('en',event)">🇬🇧 English</button>
+  </div>
+
+  <!-- ══════════ RUSSIAN ══════════ -->
+  <div id="ru" class="lang-content active">
+
+    <div class="section">
+      <div class="section-label">Установка</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Скачай и распакуй <code>crm-extension.zip</code> в любую папку на компьютере</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Открой Chrome и перейди по адресу <code>chrome://extensions/</code></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Включи <strong>«Режим разработчика»</strong> — переключатель в правом верхнем углу</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text">Нажми <strong>«Загрузить распакованное»</strong> и выбери папку <code>crm-extension</code></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text">Готово! Открой <code>crm.etg.team</code> и <strong>перезагрузи страницу (F5)</strong> — кнопки появятся справа</div></div>
+      </div>
+      <div class="note info" style="margin-top:14px;">
+        <strong>ℹ При обновлении расширения</strong>
+        Скачай новый zip, распакуй поверх старой папки, затем зайди в <code>chrome://extensions/</code> и нажми кнопку 🔄 у расширения CRM ETG Tools.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Возможности</div>
+      <div class="features-4">
+        <div class="feature-card purple">
+          <span class="feature-icon">🔁</span>
+          <div class="feature-title purple">Handover</div>
+          <div class="feature-desc">Меняет Owner на CRM Bot и Pool на incidents_handover_day одним кликом.</div>
+        </div>
+        <div class="feature-card green">
+          <span class="feature-icon">⏱</span>
+          <div class="feature-title green">Auto Prolongation</div>
+          <div class="feature-desc">Автоматически жмёт Prolongation. Причина — цветные кнопки, настройка для каждого тикета отдельно. Вкладка мигает пока активно.</div>
+        </div>
+        <div class="feature-card blue">
+          <span class="feature-icon">📂</span>
+          <div class="feature-title blue">Open Tickets</div>
+          <div class="feature-desc">Открывает тикеты из списка в фоне. Авто-обновление данных и авто-открытие по таймеру.</div>
+        </div>
+        <div class="feature-card red">
+          <span class="feature-icon">🗂</span>
+          <div class="feature-title red">Close Duplicates</div>
+          <div class="feature-desc">Закрывает дублирующиеся вкладки тикетов — оставляет по одной на каждый ID.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Как пользоваться</div>
+
+      <h2>🔁 Handover</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Открой тикет который нужно передать</div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text">Нажми <strong>🔁 Handover</strong> справа — скрипт сам откроет редактирование, поставит <strong>CRM Bot</strong> и <strong>incidents_handover_day</strong>, сохранит</div></div>
+
+      <div class="divider"></div>
+      <h2>⏱ Auto Prolongation</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Открой тикет и выбери причину продления — 4 цветные кнопки:
+        <div class="reason-preview">
+          <div class="reason-btn" style="background:#6c5ce7;">TPP</div>
+          <div class="reason-btn" style="background:#0984e3;">Client</div>
+          <div class="reason-btn" style="background:#00b894;">Hotel</div>
+          <div class="reason-btn" style="background:#e17055;">Technical problem</div>
+        </div>
+        Активная кнопка яркая, остальные приглушены
+      </div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text">Нажми <strong>⚪ AutoProlong OFF</strong> — станет <strong>🟢 AutoProlong ON</strong></div></div>
+      <div class="how-item"><div class="how-emoji">3️⃣</div><div class="how-text">Скрипт сам жмёт Prolongation, выбирает нужную причину и сохраняет. Вкладки можно свернуть</div></div>
+      <div class="how-item"><div class="how-emoji">4️⃣</div><div class="how-text">Пока AutoProlong активен — <strong>заголовок вкладки мигает</strong> между <code>⏱ AutoProlong ON</code> и названием тикета. После продления мигает <code>✅ Prolonged!</code> 5 секунд</div></div>
+      <div class="how-item"><div class="how-emoji">5️⃣</div><div class="how-text">Каждый тикет помнит свою причину и состояние <strong>ON/OFF</strong> отдельно даже после перезагрузки</div></div>
+      <div class="how-item"><div class="how-emoji">6️⃣</div><div class="how-text">Нажми <strong>🔼 Hide</strong> чтобы скрыть панель</div></div>
+
+      <div class="divider"></div>
+      <h2>📂 Open Tickets</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Перейди на страницу со списком тикетов и <strong>перезагрузи страницу (F5)</strong> — панель появится внизу справа</div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text"><strong>📂 Open New Tickets</strong> — открывает только тикеты которых нет в открытых вкладках</div></div>
+      <div class="how-item"><div class="how-emoji">3️⃣</div><div class="how-text"><strong>📂 Open All Tickets</strong> — открывает все тикеты из списка включая уже открытые</div></div>
+      <div class="how-item"><div class="how-emoji">4️⃣</div><div class="how-text"><strong>⏱ open (min)</strong> + <strong>⚪ Auto OFF</strong> — автоматически открывает новые тикеты по таймеру</div></div>
+      <div class="how-item"><div class="how-emoji">5️⃣</div><div class="how-text"><strong>🔄 reload (min)</strong> + <strong>🔄 Reload OFF</strong> — нажимает кнопку Update data по таймеру и открывает новые тикеты. Страница не перезагружается полностью</div></div>
+      <div class="how-item"><div class="how-emoji">6️⃣</div><div class="how-text">Все вкладки открываются <strong>в фоне</strong> — текущая страница не переключается</div></div>
+
+      <div class="divider"></div>
+      <h2>🗂 Close Duplicates</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Нажми <strong>🗂 Close Duplicates</strong> в панели списка тикетов</div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text">Скрипт проверяет все открытые вкладки <code>crm.etg.team/tickets/*</code> и находит дубликаты по ticket ID</div></div>
+      <div class="how-item"><div class="how-emoji">3️⃣</div><div class="how-text">Оставляет первую вкладку каждого тикета, остальные закрывает. Показывает сколько вкладок закрыл</div></div>
+
+      <div class="note info">
+        <strong>ℹ Панель Open Tickets</strong>
+        Появляется только на странице со списком тикетов. Если не видно — перезагрузи страницу (F5).
+      </div>
+      <div class="note warn">
+        <strong>⚠ Браузер должен быть открыт</strong>
+        Вкладки можно свернуть. Но если закрыть браузер — всё остановится.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Идеи для следующих версий</div>
+      <div class="ideas-grid">
+        <div class="idea-card">
+          <div class="idea-title">🔔 Уведомления системы</div>
+          Chrome-уведомление когда продление сработало — видно даже если браузер свёрнут полностью
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">📊 Счётчик продлений</div>
+          Показывать сколько раз за смену был нажат Prolongation на каждом тикете
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">⚡ Bulk Handover</div>
+          Сделать Handover сразу на всех открытых тикетах одной кнопкой из списка
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">🎨 Цветные вкладки по приоритету</div>
+          Менять эмодзи в заголовке вкладки в зависимости от приоритета тикета (Urgent 🔴, Normal 🟡)
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">⏰ Таймер до истечения</div>
+          Показывать обратный отсчёт до появления кнопки Prolongation прямо в панели
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">🔁 Авто-хендовер по расписанию</div>
+          Автоматически делать Handover в заданное время — например в конце смены
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">📋 Быстрые заметки</div>
+          Прикреплять заметки к тикетам прямо в панели расширения — хранятся локально
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">🔍 Поиск по открытым вкладкам</div>
+          Быстрый поиск среди всех открытых тикетов по ID, клиенту или статусу
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ ENGLISH ══════════ -->
+  <div id="en" class="lang-content">
+
+    <div class="section">
+      <div class="section-label">Installation</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Download and unzip <code>crm-extension.zip</code> to any folder on your computer</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Open Chrome and navigate to <code>chrome://extensions/</code></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Enable <strong>Developer Mode</strong> — toggle in the top right corner</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text">Click <strong>Load unpacked</strong> and select the <code>crm-extension</code> folder</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text">Done! Open <code>crm.etg.team</code> and <strong>reload the page (F5)</strong> — buttons will appear on the right</div></div>
+      </div>
+      <div class="note info" style="margin-top:14px;">
+        <strong>ℹ Updating the extension</strong>
+        Download the new zip, unpack over the old folder, then go to <code>chrome://extensions/</code> and click 🔄 refresh on CRM ETG Tools.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Features</div>
+      <div class="features-4">
+        <div class="feature-card purple">
+          <span class="feature-icon">🔁</span>
+          <div class="feature-title purple">Handover</div>
+          <div class="feature-desc">Sets Owner to CRM Bot and Pool to incidents_handover_day in one click.</div>
+        </div>
+        <div class="feature-card green">
+          <span class="feature-icon">⏱</span>
+          <div class="feature-title green">Auto Prolongation</div>
+          <div class="feature-desc">Auto-clicks Prolongation. Reason via colored buttons, saved per ticket. Tab title flashes while active.</div>
+        </div>
+        <div class="feature-card blue">
+          <span class="feature-icon">📂</span>
+          <div class="feature-title blue">Open Tickets</div>
+          <div class="feature-desc">Opens tickets in background tabs. Auto data refresh and auto-open on timer.</div>
+        </div>
+        <div class="feature-card red">
+          <span class="feature-icon">🗂</span>
+          <div class="feature-title red">Close Duplicates</div>
+          <div class="feature-desc">Closes duplicate ticket tabs — keeps one per ticket ID, closes the rest.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How to use</div>
+
+      <h2>🔁 Handover</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Open the ticket you want to hand over</div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text">Click <strong>🔁 Handover</strong> on the right — script opens edit mode, sets <strong>CRM Bot</strong> and <strong>incidents_handover_day</strong>, then saves</div></div>
+
+      <div class="divider"></div>
+      <h2>⏱ Auto Prolongation</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Open a ticket and pick a prolongation reason using the 4 colored buttons:
+        <div class="reason-preview">
+          <div class="reason-btn" style="background:#6c5ce7;">TPP</div>
+          <div class="reason-btn" style="background:#0984e3;">Client</div>
+          <div class="reason-btn" style="background:#00b894;">Hotel</div>
+          <div class="reason-btn" style="background:#e17055;">Technical problem</div>
+        </div>
+        Active button is bright, others are dimmed
+      </div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text">Click <strong>⚪ AutoProlong OFF</strong> — it becomes <strong>🟢 AutoProlong ON</strong></div></div>
+      <div class="how-item"><div class="how-emoji">3️⃣</div><div class="how-text">Script watches for the Prolongation button, selects the right reason and saves. Tabs can be minimized</div></div>
+      <div class="how-item"><div class="how-emoji">4️⃣</div><div class="how-text">While AutoProlong is active — <strong>tab title flashes</strong> between <code>⏱ AutoProlong ON</code> and the ticket name. After prolongation fires, flashes <code>✅ Prolonged!</code> for 5 seconds</div></div>
+      <div class="how-item"><div class="how-emoji">5️⃣</div><div class="how-text">Each ticket remembers its own reason and <strong>ON/OFF</strong> state separately, even after page reload</div></div>
+      <div class="how-item"><div class="how-emoji">6️⃣</div><div class="how-text">Click <strong>🔼 Hide</strong> to collapse the panel</div></div>
+
+      <div class="divider"></div>
+      <h2>📂 Open Tickets</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Go to the ticket list page and <strong>reload (F5)</strong> — the panel appears at the bottom right</div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text"><strong>📂 Open New Tickets</strong> — opens only tickets not currently open in browser tabs</div></div>
+      <div class="how-item"><div class="how-emoji">3️⃣</div><div class="how-text"><strong>📂 Open All Tickets</strong> — opens all tickets including already open ones</div></div>
+      <div class="how-item"><div class="how-emoji">4️⃣</div><div class="how-text"><strong>⏱ open (min)</strong> + <strong>⚪ Auto OFF</strong> — automatically opens new tickets on a timer</div></div>
+      <div class="how-item"><div class="how-emoji">5️⃣</div><div class="how-text"><strong>🔄 reload (min)</strong> + <strong>🔄 Reload OFF</strong> — clicks Update data on a timer and opens new tickets. Page does not fully reload</div></div>
+      <div class="how-item"><div class="how-emoji">6️⃣</div><div class="how-text">All tabs open <strong>in the background</strong> — your current page stays focused</div></div>
+
+      <div class="divider"></div>
+      <h2>🗂 Close Duplicates</h2>
+      <div class="how-item"><div class="how-emoji">1️⃣</div><div class="how-text">Click <strong>🗂 Close Duplicates</strong> in the ticket list panel</div></div>
+      <div class="how-item"><div class="how-emoji">2️⃣</div><div class="how-text">Script scans all open <code>crm.etg.team/tickets/*</code> tabs and finds duplicates by ticket ID</div></div>
+      <div class="how-item"><div class="how-emoji">3️⃣</div><div class="how-text">Keeps the first tab for each ticket, closes the rest. Shows how many tabs were closed</div></div>
+
+      <div class="note info">
+        <strong>ℹ Open Tickets panel</strong>
+        Only appears on the ticket list page. If you don't see it — reload the page (F5).
+      </div>
+      <div class="note warn">
+        <strong>⚠ Browser must stay open</strong>
+        Tabs can be minimized. But if you close the browser — everything stops.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Ideas for future versions</div>
+      <div class="ideas-grid">
+        <div class="idea-card">
+          <div class="idea-title">🔔 System notifications</div>
+          Chrome notification when prolongation fires — visible even if browser is fully minimized
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">📊 Prolongation counter</div>
+          Show how many times Prolongation was triggered per ticket during a shift
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">⚡ Bulk Handover</div>
+          Handover all open tickets at once with one button from the list page
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">🎨 Priority tab colors</div>
+          Change tab title emoji based on ticket priority (Urgent 🔴, Normal 🟡)
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">⏰ Countdown timer</div>
+          Show countdown until the Prolongation button appears directly in the panel
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">🔁 Scheduled Handover</div>
+          Auto-handover at a set time — for example at the end of a shift
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">📋 Quick notes</div>
+          Attach notes to tickets directly in the extension panel — stored locally
+        </div>
+        <div class="idea-card">
+          <div class="idea-title">🔍 Search open tabs</div>
+          Quick search across all open ticket tabs by ID, client, or status
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>CRM ETG Tools · Chrome Extension · v2.0</footer>
+</div>
+<script>
+  function setLang(lang,event){
+    document.querySelectorAll('.lang-content').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.lang-tab').forEach(el=>el.classList.remove('active'));
+    document.getElementById(lang).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
